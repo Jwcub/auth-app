@@ -11,14 +11,14 @@ const mongoUrl = process.env.MONGO_URL;
 
 // Anslut till databas
 mongoose.set("strictQuery", false)
-mongoose.connect(mongoUrl, {dbName: "Labb3-Users" }).then( () => {
+mongoose.connect(mongoUrl, {dbName: "DT207G-Labb4" }).then( () => {
     console.log("Ansluten till databas");
 }).catch((error) => {
     console.log("Error, kunde inte ansluta till databasen " + error);
 });
 
 // Modell för användare
-const User = require("../models/Users");
+const User = require("../models/user.model");
 
 // Registrera ny användare
 router.post("/register", async (req, res) => {
@@ -26,20 +26,19 @@ router.post("/register", async (req, res) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
-            return res.status(400).json({ error: "Invalid input, send username and password" });
+            return res.status(400).json({ error: "Felaktiga värden, ange användarnamn och lösenord" });
         }
 
         const user = new User({ username, password });
         await user.save();
 
-        res.status(201).json({ message: "User created" });
+        res.status(201).json({ message: "Användare skapad" });
 
     } catch (err) {
         // Mongoose duplicate key error
         if (err.code === 11000) {
-            return res.status(409).json({ error: "Username already taken" });
+            return res.status(409).json({ error: "Användarnamnet är upptaget" });
         }
-        console.error("FULL ERROR:", err);
         console.error("MESSAGE:", err.message);
         res.status(500).json({ error: err.message });
     }
