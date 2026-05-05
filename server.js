@@ -14,7 +14,7 @@ const port = process.env.PORT || 5501;
 // Routes
 app.use("/api", authRoutes);
 
-app.get("/api/protected", authToken, async (req, res) => {
+app.get("/api/admin", authToken, async (req, res) => {
     res.json({ message: "Skyddad route!" });
 });
 
