@@ -17,22 +17,29 @@ mongoose.connect(mongoUrl).then( () => {
     console.log("Error, kunde inte ansluta till databasen " + error);
 });
 
+// Modell för användare
+const user = require("../models/Users");
+
+// Registrera ny användare
+// Add new user
 router.post("/register", async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Validera input
-        if(!username || !password) {
-            return res.status(400).json({ error: "Felaktigt angivet användarnamn eller lösenord"})
+        if (!username || !password) {
+            return res.status(400).json({ error: "Felaktiga värden, ange användarnamn och lösenord" });
         }
 
-        // Kontrollera om användare redan finns
+        const user = new User({ username, password });
+        await user.save();
 
+        res.status(201).json({ message: "Användare skapad" });
 
-        // Accepterade input - Skapa användare
-        res.status(201).json({ message: "Användare skapad" })
-
-    } catch(error) {
+    } catch (error) {
+        // Mongoose duplicate key error
+        if (error.code === 11000) {
+            return res.status(409).json({ error: "Användarnamn upptaget" });
+        }
         res.status(500).json({ error: "Server error" });
     }
 });
