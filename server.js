@@ -8,7 +8,7 @@ require("dotenv").config();
 const authToken = require("./middlewares/authToken");
 
 const app = express();
-var cors = require("cors");
+const cors = require("cors");
 app.use(bodyParser.json());
 const port = process.env.PORT || 5501;
 
