@@ -26,9 +26,8 @@ userSchema.pre("save", async function(next) {
             const hashedPassword = await bcrypt.hash(this.password, 10);
             this.password = hashedPassword;
         }
-        next();
     } catch(error) {
-        next(error);
+        throw error;
     }
 });
 
@@ -50,7 +49,7 @@ userSchema.methods.comparePassword = async function(password) {
     } catch(error) {
         throw error;
     }
-}
+};
 
 // Logga in användare
 userSchema.statics.login = async function (username, password) {
