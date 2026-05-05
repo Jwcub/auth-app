@@ -1,3 +1,7 @@
+/*
+* Schema för användare
+*/
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
