@@ -4,7 +4,9 @@ Router för auktorisering
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
 
 const port = process.env.PORT || 5500;
 const mongoUrl = process.env.MONGO_URL;
@@ -35,7 +37,7 @@ router.post("/register", async (req, res) => {
         res.status(201).json({ message: "Användare skapad" });
 
     } catch (err) {
-        // Mongoose duplicate key error
+        // Felmeddelande för uppdatet användarnamn
         if (err.code === 11000) {
             return res.status(409).json({ error: "Användarnamnet är upptaget" });
         }
@@ -53,12 +55,30 @@ router.post("/login", async(req, res) => {
             return res.status(400).json({ error: "Felaktigt angivet användarnamn eller lösenord"})
         }
 
-        // Kontrollera inloggningsuppgifter
-        if(username === "kevin" && password === "password123") {
-            res.status(200).json({ message: "Inlogningen lyckades"})
-        } else {
-            res.status(200).json({ message: "Inlogningen misslyckades" });
-        }
+        //Kontollera inloggningsuppgifter mot databas
+
+        // Kontrollera användarnamn
+       const user = await User.findOne( { username });
+       if(!user) {
+        return res.status(401).json( { error: "Felaktigit användarnamn eller lösenord"})
+       }
+
+       // Kontrollera lösenord
+       const isPasswordMatch = await user.comparePassword(password);
+       if(!isPasswordMatch) {
+            return res.status(401).json( { error: "Felaktigit användarnamn eller lösenord"})
+       } else {
+            // Skapa JWT
+            const payload = { username: username };
+            const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "1h" });
+
+            const response = {
+                message: "Användare inloggad",
+                token: token
+            }
+
+            return res.status(200).json({ response })
+       }
 
     } catch(error) {
         res.status(500).json({ error: "Server error" })
