@@ -1,24 +1,10 @@
 /*
 Router för auktorisering
 */
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
 const authToken = require("../middlewares/authToken");
-
-
-const port = process.env.PORT || 5500;
-const mongoUrl = process.env.MONGO_URL;
-
-// Anslut till databas
-mongoose.set("strictQuery", false)
-mongoose.connect(mongoUrl, {dbName: "DT207G-Labb4" }).then( () => {
-    console.log("Ansluten till databas");
-}).catch((error) => {
-    console.log("Error, kunde inte ansluta till databasen " + error);
-});
 
 // Modell för användare
 const User = require("../models/user.model");
@@ -29,6 +15,7 @@ router.post("/register", async (req, res) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
+            console.log("Ej angivit användarnamn/lösenord");
             return res.status(400).json({ error: "Felaktiga värden, ange användarnamn och lösenord" });
         }
 
@@ -61,12 +48,14 @@ router.post("/login", async(req, res) => {
         // Kontrollera användarnamn
        const user = await User.findOne( { username });
        if(!user) {
+        console.log("Ej angivit användarnamn/lösenord");
         return res.status(401).json( { error: "Felaktigit användarnamn eller lösenord"})
        }
 
        // Kontrollera lösenord
        const isPasswordMatch = await user.comparePassword(password);
        if(!isPasswordMatch) {
+            console.log("Felaktigt användarnamn/lösenord");
             return res.status(401).json( { error: "Felaktigit användarnamn eller lösenord"})
        } else {
             // Skapa JWT
@@ -82,6 +71,7 @@ router.post("/login", async(req, res) => {
        }
 
     } catch(error) {
+        console.log(error);
         res.status(500).json({ error: "Server error" })
     }
 });
