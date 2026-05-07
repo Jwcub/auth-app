@@ -26,7 +26,7 @@ const startServer = async () => {
 
         console.log("Ansluten till databas");
 
-        app.listen(PORT, () => {
+        app.listen(port, () => {
             console.log("Server running");
         });
 
