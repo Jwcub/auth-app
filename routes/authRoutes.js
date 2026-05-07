@@ -6,6 +6,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const authToken = require("../middlewares/authToken");
 
 
 const port = process.env.PORT || 5500;
@@ -83,6 +84,10 @@ router.post("/login", async(req, res) => {
     } catch(error) {
         res.status(500).json({ error: "Server error" })
     }
+});
+
+router.get("/admin", authToken, async (req, res) => {
+    res.json({ message: "Du är inloggad och kan komma åt skyddat innehåll" });
 });
 
 module.exports = router;
