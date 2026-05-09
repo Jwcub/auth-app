@@ -76,6 +76,7 @@ router.post("/login", async(req, res) => {
     }
 });
 
+// Skyddad route
 router.get("/admin", authToken, async (req, res) => {
     res.json({ message: "Du är inloggad och kan komma åt skyddat innehåll" });
 });
